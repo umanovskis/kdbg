@@ -280,6 +280,11 @@ public:
     const QString& statusMessage() const { return m_statusMessage; }
 
     /**
+     * Retrieves the raw debugger output.
+     */
+    const QString& rawOutput() const { return m_rawOutput; }
+
+    /**
      * Is the debugger ready to receive another high-priority command?
      */
     bool isReady() const;
@@ -310,6 +315,11 @@ public:
     BrkptROIterator breakpointsEnd() const { return m_brkpts.end(); }
 
     const QString& executable() const { return m_executable; }
+
+    /**
+    * Sends a raw command to the debugger
+    */
+    void execCommand(const QString& cmd);
 
     /**
      * Terminal emulation level.
@@ -394,6 +404,7 @@ protected:
     void handleThreadList(const char* output);
     void handleSetPC(const char* output);
     void handleSetVariable(CmdQueueItem* cmd, const char* output);
+    void handleRaw(const char* output);
     void evalExpressions();
     void evalInitialStructExpression(VarTree* var, ExprWnd* wnd, bool immediate);
     void evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate);
@@ -443,6 +454,7 @@ protected:
     bool m_explicitKill;		/* whether we are killing gdb ourselves */
 
     QString m_statusMessage;
+    QString m_rawOutput;
 
 protected slots:
     void gdbExited();
@@ -507,6 +519,11 @@ signals:
      * Indicates that a new status message is available.
      */
     void updateStatusMessage();
+
+    /**
+     * Indicates that new raw output from the debugger is available.
+     */
+    void updateRawOutput();
 
     /**
      * Indicates that the internal state of the debugger has changed, and

@@ -40,6 +40,7 @@
 #include "memwindow.h"
 #include "ttywnd.h"
 #include "watchwindow.h"
+#include "cmdwindow.h"
 #include "procattach.h"
 #include "prefdebugger.h"
 #include "prefmisc.h"
@@ -100,10 +101,14 @@ DebuggerMainWnd::DebuggerMainWnd() :
     QDockWidget* dw8 = createDockWidget("Memory", i18n("Memory"));
     m_memoryWindow = new MemoryWindow(dw8);
     dw8->setWidget(m_memoryWindow);
+    QDockWidget* dw9 = createDockWidget("Commands", i18n("Commands"));
+    m_cmdWindow = new CommandWindow(dw9);
+    dw9->setWidget(m_cmdWindow);
 
     m_debugger = new KDebugger(this, m_localVariables, m_watches->watchVariables(), m_btWindow);
 
     connect(m_debugger, SIGNAL(updateStatusMessage()), SLOT(slotNewStatusMsg()));
+    connect(m_debugger, SIGNAL(updateRawOutput()), SLOT(slotNewRawOutput()));
     connect(m_debugger, SIGNAL(updateUI()), SLOT(updateUI()));
     connect(m_debugger, SIGNAL(breakpointsChanged()), SLOT(updateLineItems()));
     connect(m_debugger, SIGNAL(debuggerStarting()), SLOT(slotDebuggerStarting()));
@@ -117,6 +122,8 @@ DebuggerMainWnd::DebuggerMainWnd() :
     connect(m_watches, SIGNAL(addWatch()), SLOT(slotAddWatch()));
     connect(m_watches, SIGNAL(deleteWatch()), m_debugger, SLOT(slotDeleteWatch()));
     connect(m_watches, SIGNAL(textDropped(const QString&)), SLOT(slotAddWatch(const QString&)));
+
+    connect(m_cmdWindow, SIGNAL(execCommand()), SLOT(slotExecRawCommand()));
 
     connect(&m_filesWindow->m_findDlg, SIGNAL(closed()), SLOT(updateUI()));
     connect(m_filesWindow, SIGNAL(newFileLoaded()),
@@ -205,6 +212,7 @@ DebuggerMainWnd::~DebuggerMainWnd()
     delete m_localVariables;
     delete m_btWindow;
     delete m_filesWindow;
+    delete m_cmdWindow;
 
     delete m_outputTermProc;
 }
@@ -285,7 +293,8 @@ void DebuggerMainWnd::initKAction()
 	{ m_bpTable, "view_breakpoints", &m_bpTableAction },
 	{ m_threads, "view_threads", &m_threadsAction },
 	{ m_ttyWindow, "view_output", &m_ttyWindowAction },
-	{ m_memoryWindow, "view_memory", &m_memoryWindowAction }
+	{ m_memoryWindow, "view_memory", &m_memoryWindowAction },
+	{ m_cmdWindow, "view_cmd", &m_cmdWindowAction }
     };
     for (unsigned i = 0; i < sizeof(dw)/sizeof(dw[0]); i++) {
 	QDockWidget* d = dockParent(dw[i].w);
@@ -568,6 +577,14 @@ void DebuggerMainWnd::slotAddWatch(const QString& text)
     }
 }
 
+void DebuggerMainWnd::slotExecRawCommand()
+{
+	if (m_debugger != 0) {
+            QString cmd = m_cmdWindow->commandText();
+            m_debugger->execCommand(cmd);
+	}
+}
+
 void DebuggerMainWnd::slotNewFileLoaded()
 {
     // updates program counter in the new file
@@ -601,12 +618,15 @@ void DebuggerMainWnd::makeDefaultLayout()
     tabifyDockWidget(dockParent(m_registers), dockParent(m_bpTable));
     tabifyDockWidget(dockParent(m_bpTable), dockParent(m_ttyWindow));
     tabifyDockWidget(dockParent(m_ttyWindow), dockParent(m_btWindow));
+    tabifyDockWidget(dockParent(m_btWindow), dockParent(m_cmdWindow));
     tabifyDockWidget(dockParent(m_threads), dockParent(m_watches));
+
     dockParent(m_localVariables)->setVisible(true);
     dockParent(m_ttyWindow)->setVisible(true);
     dockParent(m_watches)->setVisible(true);
     dockParent(m_btWindow)->setVisible(true);
     dockParent(m_bpTable)->setVisible(true);
+	dockParent(m_cmdWindow)->setVisible(true);
 }
 
 bool DebuggerMainWnd::debugProgram(const QString& exe, const QString& lang)
@@ -815,6 +835,11 @@ void DebuggerMainWnd::slotNewStatusMsg()
 {
     QString msg = m_debugger->statusMessage();
     m_statusMsgLabel->setText(msg.trimmed());
+}
+
+void DebuggerMainWnd::slotNewRawOutput()
+{
+    m_cmdWindow->addText(m_debugger->rawOutput().trimmed());
 }
 
 void DebuggerMainWnd::slotFileGlobalSettings()

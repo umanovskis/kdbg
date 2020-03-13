@@ -121,6 +121,7 @@ static GdbCmdInfo cmds[] = {
     { DCignore, "ignore %d %d\n", GdbCmdInfo::argNum2},
     { DCprintWChar, "print ($s=%s)?*$s@wcslen($s):0x0\n", GdbCmdInfo::argString },
     { DCsetvariable, "set variable %s=%s\n", GdbCmdInfo::argString2 },
+    { DCraw, "%s\n", GdbCmdInfo::argString }
 };
 
 #define NUM_CMDS (int(sizeof(cmds)/sizeof(cmds[0])))

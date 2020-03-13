@@ -1186,6 +1186,9 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
     case DCsetvariable:
 	handleSetVariable(cmd, output);
 	break;
+	case DCraw:
+	handleRaw(output);
+	break;
     }
 }
 
@@ -2252,5 +2255,18 @@ void KDebugger::handleSetVariable(CmdQueueItem* cmd, const char* output)
     printCmd->m_exprWnd = cmd->m_exprWnd;
 }
 
+void KDebugger::execCommand(const QString& cmd)
+{
+	m_d->executeCmdOnce(DCraw, cmd);
+}
+
+
+void KDebugger::handleRaw(const char* output)
+{
+    if (output && *output) {
+        m_rawOutput = QString(output);
+        emit updateRawOutput();
+    }
+}
 
 #include "debugger.moc"
