@@ -1186,6 +1186,9 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
     case DCsetvariable:
 	handleSetVariable(cmd, output);
 	break;
+	case DCraw:
+	handleRaw(cmd, output);
+	break;
     }
 }
 
@@ -2252,5 +2255,19 @@ void KDebugger::handleSetVariable(CmdQueueItem* cmd, const char* output)
     printCmd->m_exprWnd = cmd->m_exprWnd;
 }
 
+#include <iostream>
+void KDebugger::execCommand(const QString& cmd)
+{
+	std::cout << "Executing raw! " << cmd.toUtf8().constData() << std::endl;
+	auto q = m_d->queueCmdPrio(DCraw, cmd);
+	std::cout << "Queued " << q->m_cmd << " " << q->m_cmdString.toUtf8().constData() << std::endl;
+	m_d->executeCmdOnce(DCraw, cmd);
+}
+
+
+void KDebugger::handleRaw(CmdQueueItem* cmd, const char* output)
+{
+	std::cout << "Handling output from cmd " << cmd->m_cmdString.toUtf8().constData() << std::endl;
+}
 
 #include "debugger.moc"

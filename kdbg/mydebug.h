@@ -18,7 +18,7 @@
 # define ASSERT(x) if (x) ; else void(qDebug() << "assertion failed: " #x "\n")
 #endif
 
-#ifdef WANT_TRACE_OUTPUT
+#if 1// def WANT_TRACE_OUTPUT
 # define TRACE(x) qDebug() << (x)
 #else
 # define TRACE(x) do {} while (0)

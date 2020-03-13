@@ -95,7 +95,8 @@ enum DbgCommand {
 	DCsetpc,
 	DCignore,
 	DCprintWChar,
-	DCsetvariable
+	DCsetvariable,
+	DCraw
 };
 
 enum RunDevNull {

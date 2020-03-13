@@ -310,6 +310,11 @@ public:
     BrkptROIterator breakpointsEnd() const { return m_brkpts.end(); }
 
     const QString& executable() const { return m_executable; }
+    
+    /**
+    * Sends a raw command to the debugger
+    */
+    void execCommand(const QString& cmd);
 
     /**
      * Terminal emulation level.
@@ -394,6 +399,7 @@ protected:
     void handleThreadList(const char* output);
     void handleSetPC(const char* output);
     void handleSetVariable(CmdQueueItem* cmd, const char* output);
+	void handleRaw(CmdQueueItem* cmd, const char* output);
     void evalExpressions();
     void evalInitialStructExpression(VarTree* var, ExprWnd* wnd, bool immediate);
     void evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate);

@@ -27,6 +27,7 @@ class ThreadList;
 class MemoryWindow;
 class TTYWindow;
 class WatchWindow;
+class CommandWindow;
 class KDebugger;
 class DebuggerDriver;
 struct DbgAddr;
@@ -76,6 +77,7 @@ protected:
     TTYWindow* m_ttyWindow;
     ThreadList* m_threads;
     MemoryWindow* m_memoryWindow;
+	CommandWindow* m_cmdWindow;
 
     QTimer m_backTimer;
 
@@ -95,6 +97,7 @@ protected:
     QAction* m_ttyWindowAction;
     QAction* m_threadsAction;
     QAction* m_memoryWindowAction;
+	QAction* m_cmdWindowAction;
     QAction* m_runAction;
     QAction* m_stepIntoAction;
     QAction* m_stepOverAction;
@@ -192,6 +195,7 @@ public slots:
     void slotLocalsPopup(const QPoint& pt);
     void slotLocalsToWatch();
     void slotEditValue();
+	void slotExecRawCommand();
 
     void slotFileOpen();
     void slotFileExe();
