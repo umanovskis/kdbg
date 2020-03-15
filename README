@@ -1,3 +1,17 @@
+This repo is a small fork of KDbg mainly for my own use.
+
+The only new feature is that a generic command interface
+has been added. There's a new window in the UI which
+passes any commands directly to gdb, as entered. Doing
+that is probably a bad idea for regular commands that
+can be executed through the GUI, but it might be
+necessary for architecture-specific gdb commands or other
+advanced use cases.
+
+Original readme follows.
+
+==================
+
 This is KDbg, a graphical user interface around GDB using
 KDE, the K Desktop Environment.
 
